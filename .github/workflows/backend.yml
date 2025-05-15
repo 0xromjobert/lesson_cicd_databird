@@ -9,27 +9,57 @@ on:
 jobs:
   test_backend:
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: dev
+          POSTGRES_PASSWORD: dev
+          POSTGRES_DB: mydb
+        options: >-
+          --health-cmd "pg_isready"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: mydb
+      DB_HOST: localhost
+
     steps:
-      - name: Récupération du code
+      - name: Checkout du code
         uses: actions/checkout@v4
 
-      - name: Installation de Python
+      - name: Installer Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
-      - name: Installation des dépendances Python
+      - name: Installer les dépendances
         run: |
           cd backend
           pip install -r requirements.txt
 
-      - name: Vérification de la qualité du code (flake8)
+      - name: Vérification du style avec flake8
         run: |
           pip install flake8
           flake8 backend/app.py
 
-      - name: Vérification du point de santé de l'API
+      - name: Lancer l'API et vérifier sa santé
         run: |
           python backend/app.py &
-          sleep 2
-          curl http://localhost:5000/health
+          for i in {1..10}; do
+            echo "Attente du démarrage de l'API..."
+            sleep 2
+            if curl -s http://localhost:5000/health; then
+              echo "API en ligne"
+              exit 0
+            fi
+          done
+          echo "L'API ne répond pas après 20 secondes"
+          exit 1
