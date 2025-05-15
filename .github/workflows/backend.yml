@@ -1,0 +1,35 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test_backend:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v4
+
+      - name: Installation de Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Installation des dépendances Python
+        run: |
+          cd backend
+          pip install -r requirements.txt
+
+      - name: Vérification de la qualité du code (flake8)
+        run: |
+          pip install flake8
+          flake8 backend/app.py
+
+      - name: Vérification du point de santé de l'API
+        run: |
+          python backend/app.py &
+          sleep 2
+          curl http://localhost:5000/health

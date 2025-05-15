@@ -1,0 +1,25 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test_frontend:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v4
+
+      - name: Vérification des fichiers requis
+        run: |
+          test -f frontend/index.html
+          test -f frontend/app.js
+
+      - name: Affichage du contenu du dossier frontend
+        run: |
+          echo "Contenu du dossier frontend :"
+          ls -l frontend
