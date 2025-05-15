@@ -51,7 +51,10 @@ def health():
 def get_messages():
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("SELECT id, content, created_at FROM messages ORDER BY created_at DESC;")
+    cur.execute(
+        "SELECT id, content, created_at FROM messages "
+        "ORDER BY created_at DESC;"
+    )
     rows = cur.fetchall()
     cur.close()
     conn.close()
@@ -64,6 +67,7 @@ def get_messages():
 
 @app.route("/messages", methods=["POST"])
 def post_message():
+    print("POST /messages triggered")
     data = request.get_json()
     content = data.get("content")
 
@@ -72,7 +76,10 @@ def post_message():
 
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("INSERT INTO messages (content) VALUES (%s) RETURNING id;", (content,))
+    cur.execute(
+        "INSERT INTO messages (content) VALUES (%s) RETURNING id;",
+        (content,)
+    )
     new_id = cur.fetchone()[0]
     conn.commit()
     cur.close()

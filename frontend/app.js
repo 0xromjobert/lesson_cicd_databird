@@ -13,20 +13,31 @@ async function loadMessages() {
   });
 }
 
-async function addMessage() {
+async function addMessage(event) {
+  event.preventDefault();
+  console.log("in the addmessenge event");
   const input = document.getElementById("content");
   const content = input.value;
   if (!content) return;
 
-  await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ content })
-  });
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content })
+    });
 
-  input.value = "";
-  loadMessages();
+    if (!response.ok) {
+      throw new Error("Erreur lors de l'envoi du message.");
+    }
+
+    input.value = "";
+    loadMessages();
+  } catch (err) {
+    alert(err.message || "Une erreur est survenue.");
+  }
 }
+
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("message-form").addEventListener("submit", addMessage);
   loadMessages();
