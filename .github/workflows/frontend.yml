@@ -28,8 +28,5 @@ jobs:
 
       - name: Construction et push de l'image Docker frontend
         run: | 
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/databird-api:frontend-latest \
-                 -t ${{ secrets.DOCKER_USERNAME }}/databird-api:frontend-${{ github.sha }} \
-                 ./frontend
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/databird-api:frontend-latest 
           docker push ${{ secrets.DOCKER_USERNAME }}/databird-api:frontend-latest
-          docker push ${{ secrets.DOCKER_USERNAME }}/databird-api:frontend-${{ github.sha }}

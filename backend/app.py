@@ -3,12 +3,12 @@ import psycopg2
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
-
+# CORS : autoriser le frontend local ET déployé sur Render
 app = Flask(__name__)
 
 CORS(app, origins=[
-    "http://localhost:3000",
-    "https://frontend-app.onrender.com"
+    "http://localhost:3000",  # développement local
+    "https://frontend-app-x026.onrender.com"
 ])
 
 

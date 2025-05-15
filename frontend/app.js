@@ -1,5 +1,5 @@
 
-const API_URL = "http://localhost:3001/messages";
+const API_URL = "https://databird-backend.onrender.com/messages";
 
 async function loadMessages() {
   const res = await fetch(API_URL);
