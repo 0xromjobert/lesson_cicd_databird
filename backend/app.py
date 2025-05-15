@@ -1,21 +1,28 @@
-
 import os
 import psycopg2
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
+
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:3000"])
+
+CORS(app, origins=[
+    "http://localhost:3000",
+    "https://frontend-app.onrender.com"
+])
+
 
 db_config = {
-    "host": os.getenv("DB_HOST", "db"),
+    "host": os.getenv("DB_HOST", "localhost"),
     "dbname": os.getenv("POSTGRES_DB", "mydb"),
     "user": os.getenv("POSTGRES_USER", "dev"),
     "password": os.getenv("POSTGRES_PASSWORD", "dev")
 }
 
+
 def get_connection():
     return psycopg2.connect(**db_config)
+
 
 def init_db():
     conn = get_connection()
@@ -31,11 +38,14 @@ def init_db():
     cur.close()
     conn.close()
 
+
 init_db()
 
+
 @app.route("/health", methods=["GET"])
-def health_check():
+def health():
     return {"status": "ok"}
+
 
 @app.route("/messages", methods=["GET"])
 def get_messages():
@@ -45,11 +55,12 @@ def get_messages():
     rows = cur.fetchall()
     cur.close()
     conn.close()
-    messages = [
-        {"id": row[0], "content": row[1], "created_at": row[2].isoformat()}
-        for row in rows
-    ]
-    return jsonify(messages)
+
+    return jsonify([
+        {"id": r[0], "content": r[1], "created_at": r[2].isoformat()}
+        for r in rows
+    ])
+
 
 @app.route("/messages", methods=["POST"])
 def post_message():
@@ -68,6 +79,7 @@ def post_message():
     conn.close()
 
     return jsonify({"message": "Message added", "id": new_id}), 201
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
